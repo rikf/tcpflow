@@ -94,7 +94,7 @@ void debug_real(char *fmt, ...)
   print_debug_message(fmt, ap);
   va_end(ap);
 }
-  
+
 
 /* Print a debugging or informatioal message, then exit  */
 void die(char *fmt, ...)
@@ -187,6 +187,12 @@ int get_max_fds(void)
     else
       limit.rlim_cur = limit.rlim_max;
 
+    limit.rlim_cur = limit.rlim_max;
+		#ifdef OPEN_MAX
+		        if(limit.rlim_cur > OPEN_MAX) limit.rlim_cur = OPEN_MAX;
+		#endif
+
+
     if (setrlimit(RLIMIT_NOFILE, &limit) < 0) {
       perror("calling setrlimit");
       exit(1);
@@ -241,7 +247,7 @@ int get_max_fds(void)
 
 /* An attempt at making signal() portable.
  *
- * If we detect sigaction, use that; 
+ * If we detect sigaction, use that;
  * otherwise if we have setsig, use that;
  * otherwise, cross our fingers and hope for the best using plain old signal().
  *

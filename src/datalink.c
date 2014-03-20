@@ -53,8 +53,7 @@ void dl_null(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 {
   u_int caplen = h->caplen;
   u_int length = h->len;
-  u_int family;
-
+  uint32_t family = *(uint32_t *)p;
   if (length != caplen) {
     DEBUG(6) ("warning: only captured %d bytes of %d byte null frame",
 	  caplen, length);
@@ -69,11 +68,9 @@ void dl_null(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
    * not set correctly, so we don't check for it -- instead, just
    * assume everything is IP.  --JE 20 April 1999*/
 #ifndef DLT_NULL_BROKEN
-  /* make sure this is AF_INET */
-  memcpy((char *)&family, (char *)p, sizeof(family));
-  family = ntohl(family);
-  if (family != AF_INET) {
-    DEBUG(6) ("warning: received non-AF_INET null frame (type %d)", family);
+  if (family != AF_INET && family != AF_INET6) {
+    DEBUG(6)("warning: received null frame with unknown type (type %d) (AF_INET=%d; AF_INET6=%d)",
+    family,AF_INET,AF_INET6);
     return;
   }
 #endif
@@ -169,7 +166,7 @@ void dl_linux_sll(u_char *user, const struct pcap_pkthdr *h, const u_char *p){
     DEBUG(6) ("warning: received incomplete Linux cooked frame");
     return;
   }
-  
+
   process_ip(p + SLL_HDR_LEN, caplen - SLL_HDR_LEN);
 }
 
@@ -177,6 +174,8 @@ void dl_linux_sll(u_char *user, const struct pcap_pkthdr *h, const u_char *p){
 pcap_handler find_handler(int datalink_type, char *device)
 {
   int i;
+  DEBUG(2) ("looking for handler for datalink type %d for interface %s",
+	datalink_type, device);
 
   struct {
     pcap_handler handler;
@@ -195,8 +194,6 @@ pcap_handler find_handler(int datalink_type, char *device)
     { NULL, 0 },
   };
 
-  DEBUG(2) ("looking for handler for datalink type %d for interface %s",
-	datalink_type, device);
 
   for (i = 0; handlers[i].handler != NULL; i++)
     if (handlers[i].type == datalink_type)

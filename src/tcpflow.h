@@ -88,7 +88,7 @@ typedef struct flow_state_struct {
 
 typedef struct flow_state_struct flow_state_t;
 
-  
+
 /***************************** Macros *************************************/
 
 #define MALLOC(type, num)  (type *) check_malloc((num) * sizeof(type))

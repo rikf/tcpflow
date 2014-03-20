@@ -228,6 +228,7 @@ int main(int argc, char *argv[])
     /* get the handler for this kind of packets */
     dlt = pcap_datalink(pd);
     handler = find_handler(dlt, device);
+    DEBUG(6) ("The handler is %s",handler);
   }
 
   /* get the user's expression out of argv */
