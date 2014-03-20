@@ -1,4 +1,4 @@
-tcpflow
-=======
+tcpflow classic addition
+========================
 
-brew package of original tcpflow with additional debian patches 
+classic tcpflow with additional debian patches and ported to osx
